@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drunkeinstein | Portal</title>
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --card-bg: #18181b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --border: #27272a;
+            --nav-height: 70px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Advanced Navigation Bar --- */
+        nav {
+            background-color: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            height: var(--nav-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .brand span {
+            color: var(--accent);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+        }
+
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* Hamburger Menu (Mobile) */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        /* --- Main Content Area --- */
+        main {
+            flex: 1;
+            margin-top: var(--nav-height);
+            padding: 3rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .page-content {
+            display: none; /* Hidden by default */
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* JS triggers this class to show the page with an animation */
+        .page-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 { margin-bottom: 1.5rem; font-size: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        h2 { margin: 2rem 0 1rem 0; font-size: 1.3rem; color: var(--accent); }
+        p { color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 1.05rem; }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+        .btn:hover { background-color: var(--accent-hover); }
+
+        /* --- Responsive Mobile Styles --- */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: absolute;
+                top: var(--nav-height);
+                right: -100%;
+                flex-direction: column;
+                background-color: rgba(24, 24, 27, 0.98);
+                width: 100%;
+                text-align: center;
+                transition: 0.4s;
+                padding: 2rem 0;
+                border-bottom: 1px solid var(--border);
+                gap: 1.5rem;
+            }
+
+            .nav-menu.active {
+                right: 0;
+            }
+            
+            .page-content {
+                padding: 1.5rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand" onclick="navigateTo('home')">DRUNK<span>EINSTEIN</span></div>
+        
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-menu" id="nav-menu">
+            <li class="nav-item active" onclick="navigateTo('home')" id="nav-home">Home</li>
+            <li class="nav-item" onclick="navigateTo('policies')" id="nav-policies">Refund Policy</li>
+            <li class="nav-item" onclick="navigateTo('cancel')" id="nav-cancel">Cancellation</li>
+            <li class="nav-item" onclick="navigateTo('contact')" id="nav-contact">Contact Us</li>
+        </ul>
+    </nav>
+
+    <main>
+        
+        <div id="home" class="page-content active">
+            <h1>Gateway Dashboard</h1>
+            <p>Welcome to the official <strong>Drunkeinstein</strong> secure payment gateway. This system is actively monitoring transactions for your Telegram bot integration.</p>
+            <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 8px; margin-top: 1.5rem; display: inline-block;">
+                <strong>System Status:</strong> 100% Operational
+            </div>
+        </div>
+
+        <div id="policies" class="page-content">
+            <h1>Refund Policy</h1>
+            <p>At Drunkeinstein, we strive to provide the best premium bot experience. Because our digital services are delivered instantly upon successful payment, we have strict guidelines regarding refunds.</p>
+            <h2>General Policy</h2>
+            <p>All sales are considered final. We do not offer refunds for "buyer's remorse" or if you simply change your mind after accessing the restricted bot features.</p>
+            <h2>Exceptions</h2>
+            <p>Refunds will only be processed if there is a verified technical failure on our end that prevents you from receiving the digital goods you paid for, and our support team is unable to resolve the issue within 48 hours.</p>
+        </div>
+
+        <div id="cancel" class="page-content">
+            <h1>Cancellation Policy</h1>
+            <p>We believe in putting you in control of your subscriptions and payments.</p>
+            <h2>How to Cancel</h2>
+            <p>If you are on a recurring billing cycle, you can cancel your premium bot subscription at any time directly through the bot using the <code>/account</code> command, or by contacting our support team.</p>
+            <h2>Post-Cancellation</h2>
+            <p>Once cancelled, you will not be billed again. However, your premium access will remain active until the end of your current billing period. We do not provide prorated refunds for mid-month cancellations.</p>
+        </div>
+
+        <div id="contact" class="page-content">
+            <h1>Contact Us</h1>
+            <p>Having trouble with a payment or need help with the bot? The Drunkeinstein team is online and ready to assist you.</p>
+            
+            <h2>Reach Out Directly</h2>
+            <p><strong>Telegram Support:</strong> @DrunkeinsteinSupport (Average response time: 2 hours)</p>
+            <p><strong>Email Queries:</strong> payments@drunkeinstein.com</p>
+            
+            <button class="btn" onclick="window.open('https://t.me/your_bot_username', '_blank')">Message Support Bot</button>
+        </div>
+
+        <div id="success" class="page-content" style="text-align: center;">
+            <div style="font-size: 5rem; margin-bottom: 1rem;">✅</div>
+            <h1 style="border: none;">Payment Successful!</h1>
+            <p>Thank you! Your payment has been securely verified by Razorpay.</p>
+            <p style="color: var(--text-main); font-weight: bold; margin-top: 2rem;">
+                Your bot account has been upgraded. You may now close this window and return to Telegram.
+            </p>
+        </div>
+
+    </main>
+
+    <footer>
+        &copy; 2026 Drunkeinstein Organization. Powered by Vercel & Razorpay.
+    </footer>
+
+    <script>
+        const hamburger = document.querySelector(".hamburger");
+        const navMenu = document.querySelector(".nav-menu");
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            navMenu.classList.toggle("active");
+        }
+
+        // Handle page navigation
+        function navigateTo(pageId) {
+            // 1. Hide the mobile menu if it's open
+            navMenu.classList.remove("active");
+
+            // 2. Remove 'active' class from all page contents
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 3. Remove 'active' class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // 4. Show the selected page
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) {
+                // Small delay to allow CSS animation to trigger smoothly
+                setTimeout(() => {
+                    targetPage.classList.add('active');
+                }, 50);
+            }
+
+            // 5. Highlight the active nav item (if it's in the menu)
+            const activeNav = document.getElementById('nav-' + pageId);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+
+            // 6. Update the URL hash so the user can share specific pages (e.g. #contact)
+            window.location.hash = pageId;
+            window.scrollTo(0, 0); // scroll to top
+        }
+
+        // Check the URL when the site loads. If they go to yoursite.com/#success, load the success page.
+        window.onload = function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                navigateTo(hash);
+            }
+        };
+    </script>
+</body>
+</html>
