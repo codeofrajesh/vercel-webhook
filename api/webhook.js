@@ -50,7 +50,7 @@ export default async function handler(req, res) {
         console.log(`🔍 Checking variables -> Admin ID: ${adminChatId ? adminChatId : "MISSING!"}`);
         
         if (orderId && adminChatId) {
-          await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} paid`);
+          await sendTelegramMessage(adminChatId, `/rzpwebhook ${orderId} paid`);
         } else {
           console.error("❌ ABORTED: Cannot send message because adminChatId is missing!");
         }
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       case 'payment.swailed':
         // Tell the bot it failed (optional, but good for logging)
         if (orderId && adminChatId) {
-           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} failed`);
+           await sendTelegramMessage(adminChatId, `/rzpwebhook ${orderId} failed`);
         }
         // Still send a direct message to the user so they know what happened
         if (telegramId) {
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
         case 'payment.failed':
         // 1. Tell the Python bot it failed
         if (orderId && adminChatId) {
-           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} failed`);
+           await sendTelegramMessage(adminChatId, `/rzpwebhook ${orderId} failed`);
         }
         // 2. Tell the user it failed
         if (telegramId) {
