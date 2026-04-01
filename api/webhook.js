@@ -47,9 +47,12 @@ export default async function handler(req, res) {
       
       case 'payment_link.paid':
         console.log(`✅ Success for Order: ${orderId}`);
-        // Send the hidden trigger to the Python Bot
+        console.log(`🔍 Checking variables -> Admin ID: ${adminChatId ? adminChatId : "MISSING!"}`);
+        
         if (orderId && adminChatId) {
           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} paid`);
+        } else {
+          console.error("❌ ABORTED: Cannot send message because adminChatId is missing!");
         }
         break;
 
@@ -117,23 +120,31 @@ async function sendTelegramMessage(chatId, text) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   
   if (!botToken) {
-    console.error("❌ TELEGRAM_BOT_TOKEN is missing in Vercel Settings!");
+    console.error("❌ ERROR: TELEGRAM_BOT_TOKEN is missing in Vercel!");
     return;
   }
+
+  console.log(`🚀 Attempting to send message to Telegram Chat: ${chatId}`);
+  console.log(`📄 Payload: ${text}`);
 
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
   try {
-    await fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown'
-      })
+      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
     });
+
+    // THIS IS THE MAGIC CHECK!
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error(`❌ TELEGRAM API REJECTED MESSAGE! Status: ${response.status}`);
+      console.error(`❌ Telegram Error Details: ${errorData}`);
+    } else {
+      console.log("✅ MESSAGE SUCCESSFULLY DELIVERED TO TELEGRAM!");
+    }
   } catch (error) {
-    console.error("Failed to send Telegram message:", error);
+    console.error("❌ NETWORK CRASH while talking to Telegram:", error);
   }
 }
