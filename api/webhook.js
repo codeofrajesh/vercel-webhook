@@ -46,16 +46,14 @@ export default async function handler(req, res) {
     switch (event) {
       
       case 'payment_link.paid':
-      case 'payment.captured':
-        console.log(`Processing successful payment for Order: ${orderId}`);
-        // THIS IS THE MAGIC BRIDGE! 
-        // Vercel tells the Python bot: "Hey, this order is paid, do your thing!"
+        console.log(`✅ Success for Order: ${orderId}`);
+        // Send the hidden trigger to the Python Bot
         if (orderId && adminChatId) {
           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} paid`);
         }
         break;
 
-      case 'payment.failed':
+      case 'payment.swailed':
         // Tell the bot it failed (optional, but good for logging)
         if (orderId && adminChatId) {
            await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} failed`);
@@ -65,6 +63,19 @@ export default async function handler(req, res) {
           await sendTelegramMessage(
             telegramId, 
             `❌ *Payment Failed*\n\n*Reason:* ${paymentEntity?.error_description || 'Bank issue'}\n\nDon't worry, no money was deducted. Please click the payment link again to retry, or try a different UPI app.`
+          );
+        }
+        break;
+        case 'payment.failed':
+        // 1. Tell the Python bot it failed
+        if (orderId && adminChatId) {
+           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} failed`);
+        }
+        // 2. Tell the user it failed
+        if (telegramId) {
+          await sendTelegramMessage(
+            telegramId, 
+            `❌ *Payment Failed*\n\nYour payment for Order \`${orderId}\` could not be processed. Please click the payment link again to retry, or use a different UPI app.`
           );
         }
         break;
