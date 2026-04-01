@@ -8,6 +8,9 @@ export default async function handler(req, res) {
 
   // Your Vercel environment variables
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  
+  // 🚨 CRITICAL: Make sure you add this variable in your Vercel Dashboard!
+  const adminChatId = process.env.ADMIN_CHAT_ID; 
 
   // Razorpay sends a signature in the headers to prove it's really them
   const signature = req.headers['x-razorpay-signature'];
@@ -28,37 +31,40 @@ export default async function handler(req, res) {
     // --- 🟢 SIGNATURE VALID: EXTRACT THE DATA ---
     const event = req.body.event; 
     
-    // Extract the payment details and the Telegram ID from the notes
-    // (Razorpay places the entity in different spots depending on the event type)
+    // Extract the payment details
     const paymentEntity = req.body.payload.payment ? req.body.payload.payment.entity : null;
-    const paymentLinkId = req.body.payload.payment_link ? req.body.payload.payment_link.entity.id : 'N/A';
     
-    // CRITICAL: This pulls the user's Telegram ID that you must attach when creating the link
-    const telegramId = paymentEntity?.notes?.telegram_id || req.body.payload.payment_link?.entity?.notes?.telegram_id;
+    // Safely extract the notes (this is where we hid the order_id and telegram_id)
+    const notes = paymentEntity?.notes || req.body.payload.payment_link?.entity?.notes || {};
+    
+    const telegramId = notes.telegram_id;
+    const orderId = notes.order_id; // We need this for the Python bot!
 
-    console.log(`✅ Webhook Event Received: ${event}`);
+    console.log(`✅ Webhook Event Received: ${event} for Order: ${orderId}`);
 
     // --- 🔀 EVENT SWITCHBOARD ---
     switch (event) {
       
       case 'payment_link.paid':
       case 'payment.captured':
-        console.log(`Processing successful payment for Telegram ID: ${telegramId}`);
-        if (telegramId) {
-          const amount = paymentEntity.amount / 100; // Convert paise back to rupees
-          await sendTelegramMessage(
-            telegramId, 
-            `✅ *Payment Successful!*\n\n*Receipt:* \`${paymentEntity.id}\`\n*Amount:* ₹${amount}\n\n🚀 Your **Drunkeinstein Pro** subscription is now ACTIVE! Type /start to refresh.`
-          );
+        console.log(`Processing successful payment for Order: ${orderId}`);
+        // THIS IS THE MAGIC BRIDGE! 
+        // Vercel tells the Python bot: "Hey, this order is paid, do your thing!"
+        if (orderId && adminChatId) {
+          await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} paid`);
         }
-        // TODO: Add your database code here later to change User Status to "Pro = True"
         break;
 
       case 'payment.failed':
+        // Tell the bot it failed (optional, but good for logging)
+        if (orderId && adminChatId) {
+           await sendTelegramMessage(adminChatId, `/rzp_webhook ${orderId} failed`);
+        }
+        // Still send a direct message to the user so they know what happened
         if (telegramId) {
           await sendTelegramMessage(
             telegramId, 
-            `❌ *Payment Failed*\n\n*Reason:* ${paymentEntity.error_description || 'Bank issue'}\n\nDon't worry, no money was deducted. Please click the link again to retry or try a different UPI app.`
+            `❌ *Payment Failed*\n\n*Reason:* ${paymentEntity?.error_description || 'Bank issue'}\n\nDon't worry, no money was deducted. Please click the payment link again to retry, or try a different UPI app.`
           );
         }
         break;
@@ -67,18 +73,17 @@ export default async function handler(req, res) {
         if (telegramId) {
           await sendTelegramMessage(
             telegramId, 
-            `⏳ *Payment Pending...*\nWe are waiting for final confirmation from your bank. Please wait a moment.`
+            `⏳ *Payment Pending...*\nWe are waiting for final confirmation from your bank for Order \`${orderId}\`. Please wait a moment.`
           );
         }
         break;
 
       case 'payment.dispute.created':
-        // If a user tries to commit fraud (chargeback), alert YOU (the Admin), not them.
-        const adminChatId = process.env.ADMIN_TELEGRAM_ID; 
+        // If a user tries to commit fraud (chargeback), alert YOU immediately.
         if (adminChatId) {
           await sendTelegramMessage(
             adminChatId, 
-            `🚨 *FRAUD / DISPUTE ALERT*\n\n*Payment ID:* \`${paymentEntity.id}\`\n*Telegram ID:* \`${telegramId}\`\n\nThe user raised a dispute with their bank. Please ban this user and check Razorpay dashboard.`
+            `🚨 *FRAUD / DISPUTE ALERT*\n\n*Order ID:* \`${orderId}\`\n*Telegram ID:* \`${telegramId}\`\n\nThe user raised a dispute with their bank. Please ban this user and check your Razorpay dashboard.`
           );
         }
         break;
