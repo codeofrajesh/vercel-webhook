@@ -145,6 +145,7 @@
 
         h1 { margin-bottom: 1.5rem; font-size: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
         h2 { margin: 2rem 0 1rem 0; font-size: 1.3rem; color: var(--accent); }
+        h3 { margin: 1.5rem 0 0.5rem 0; font-size: 1.1rem; color: var(--text-main); }
         p { color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 1.05rem; }
 
         .btn {
@@ -161,12 +162,30 @@
         }
         .btn:hover { background-color: var(--accent-hover); }
 
+        .pricing-grid {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pricing-card {
+            flex: 1;
+            min-width: 250px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .pricing-card h3 { margin-top: 0; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;}
+        .pricing-card h2 { margin: 1rem 0; color: var(--text-main); font-size: 2.5rem; }
+        .pricing-card.featured { border-color: var(--accent); position: relative; }
+
         /* --- Responsive Mobile Styles --- */
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
+            .hamburger { display: flex; }
             .nav-menu {
                 position: absolute;
                 top: var(--nav-height);
@@ -180,14 +199,8 @@
                 border-bottom: 1px solid var(--border);
                 gap: 1.5rem;
             }
-
-            .nav-menu.active {
-                right: 0;
-            }
-            
-            .page-content {
-                padding: 1.5rem;
-            }
+            .nav-menu.active { right: 0; }
+            .page-content { padding: 1.5rem; }
         }
 
         footer {
@@ -212,48 +225,77 @@
 
         <ul class="nav-menu" id="nav-menu">
             <li class="nav-item active" onclick="navigateTo('home')" id="nav-home">Home</li>
-            <li class="nav-item" onclick="navigateTo('policies')" id="nav-policies">Refund Policy</li>
-            <li class="nav-item" onclick="navigateTo('cancel')" id="nav-cancel">Cancellation</li>
-            <li class="nav-item" onclick="navigateTo('contact')" id="nav-contact">Contact Us</li>
+            <li class="nav-item" onclick="navigateTo('pricing')" id="nav-pricing">Pricing</li>
+            <li class="nav-item" onclick="navigateTo('policies')" id="nav-policies">Policies</li>
+            <li class="nav-item" onclick="navigateTo('terms')" id="nav-terms">Terms & Privacy</li>
+            <li class="nav-item" onclick="navigateTo('contact')" id="nav-contact">Contact</li>
         </ul>
     </nav>
 
     <main>
-        
         <div id="home" class="page-content active">
             <h1>Gateway Dashboard</h1>
-            <p>Welcome to the official <strong>Drunkeinstein</strong> secure payment gateway. This system is actively monitoring transactions for your Telegram bot integration.</p>
+            <p>Welcome to the official <strong>Drunkeinstein</strong> secure payment gateway and product portal. We specialize in developing advanced automation tools, Telegram bots, and managing premium digital communities.</p>
+            <p>This system actively monitors and processes secure transactions for our automated bot integrations.</p>
             <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 8px; margin-top: 1.5rem; display: inline-block;">
-                <strong>System Status:</strong> 100% Operational
+                <strong>System Status:</strong> 100% Operational & Secure
+            </div>
+        </div>
+
+        <div id="pricing" class="page-content">
+            <h1>Our Pricing</h1>
+            <p>Simple, transparent pricing for premium community access and bot services.</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>1 Month Access</h3>
+                    <h2>₹150</h2>
+                    <p>30 days of uninterrupted premium channel and bot access.</p>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>Lifetime Access</h3>
+                    <h2>₹99</h2>
+                    <p>Permanent access to the community and all future updates.</p>
+                </div>
             </div>
         </div>
 
         <div id="policies" class="page-content">
-            <h1>Refund Policy</h1>
-            <p>At Drunkeinstein, we strive to provide the best premium bot experience. Because our digital services are delivered instantly upon successful payment, we have strict guidelines regarding refunds.</p>
-            <h2>General Policy</h2>
-            <p>All sales are considered final. We do not offer refunds for "buyer's remorse" or if you simply change your mind after accessing the restricted bot features.</p>
-            <h2>Exceptions</h2>
-            <p>Refunds will only be processed if there is a verified technical failure on our end that prevents you from receiving the digital goods you paid for, and our support team is unable to resolve the issue within 48 hours.</p>
+            <h1>Refund & Cancellation</h1>
+            
+            <h2>Refund Policy</h2>
+            <p>At Drunkeinstein, we strive to provide the best premium bot experience. Because our digital services and community links are delivered instantly upon successful payment, <strong>all sales are strictly final.</strong> We do not offer refunds for "buyer's remorse" or if you change your mind after accessing the restricted bot features.</p>
+            <p>Refunds will only be processed if there is a verified technical failure on our end that prevents you from receiving the digital goods, and our support team is unable to resolve the issue within 48 hours.</p>
+
+            <h2>Cancellation Policy</h2>
+            <p>If you are on a recurring billing cycle, you can cancel your premium bot subscription at any time directly through the bot using the <code>/account</code> command, or by contacting our support team.</p>
+            <p>Once cancelled, you will not be billed again. Your premium access will remain active until the end of your current billing period. We do not provide prorated refunds for mid-month cancellations.</p>
         </div>
 
-        <div id="cancel" class="page-content">
-            <h1>Cancellation Policy</h1>
-            <p>We believe in putting you in control of your subscriptions and payments.</p>
-            <h2>How to Cancel</h2>
-            <p>If you are on a recurring billing cycle, you can cancel your premium bot subscription at any time directly through the bot using the <code>/account</code> command, or by contacting our support team.</p>
-            <h2>Post-Cancellation</h2>
-            <p>Once cancelled, you will not be billed again. However, your premium access will remain active until the end of your current billing period. We do not provide prorated refunds for mid-month cancellations.</p>
+        <div id="terms" class="page-content">
+            <h1>Terms & Privacy Policy</h1>
+
+            <h2>Terms and Conditions</h2>
+            <p>By using the Drunkeinstein bot and portal, you agree to abide by our community guidelines. Services are provided "as-is" without any warranties. We reserve the right to revoke access without a refund if a user violates Telegram's Terms of Service, shares premium content externally, or engages in spam.</p>
+
+            <h2>Privacy Policy</h2>
+            <p>We respect your privacy. We only collect the necessary information (Telegram User ID, Username, and Payment ID) required to facilitate your premium access. We do not sell, rent, or share your data with third parties. All financial transactions are processed securely via Razorpay; we do not store your credit card or UPI details on our servers.</p>
+
+            <h2>Shipping and Delivery Policy</h2>
+            <p>Our products are entirely digital. Upon successful payment verification, your unique, single-use Telegram invite link or bot access token will be automatically "delivered" to you immediately via our Telegram Bot. <strong>No physical goods are shipped.</strong></p>
         </div>
 
         <div id="contact" class="page-content">
             <h1>Contact Us</h1>
             <p>Having trouble with a payment or need help with the bot? The Drunkeinstein team is online and ready to assist you.</p>
             
-            <h2>Reach Out Directly</h2>
-            <p><strong>Telegram Support:</strong> @DrunkeinsteinSupport (Average response time: 2 hours)</p>
-            <p><strong>Email Queries:</strong> payments@drunkeinstein.com</p>
+            <h2>Business Details</h2>
+            <p><strong>Email:</strong> payments@drunkeinstein.com</p>
+            <p><strong>Phone:</strong> +91 9876543210 <br><span style="font-size: 0.85rem; color: var(--text-muted);">(Operating Hours: Mon-Fri, 10:00 AM - 6:00 PM IST)</span></p>
+            <p><strong>Registered Address:</strong><br>123 Developer Hub, Patia<br>Bhubaneswar, Odisha, 751024, India</p>
             
+            <h2>Technical Support</h2>
+            <p><strong>Telegram:</strong> @DrunkeinsteinSupport</p>
             <button class="btn" onclick="window.open('https://t.me/your_bot_username', '_blank')">Message Support Bot</button>
         </div>
 
@@ -283,42 +325,34 @@
 
         // Handle page navigation
         function navigateTo(pageId) {
-            // 1. Hide the mobile menu if it's open
             navMenu.classList.remove("active");
 
-            // 2. Remove 'active' class from all page contents
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => {
                 page.classList.remove('active');
             });
 
-            // 3. Remove 'active' class from all nav items
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => {
                 item.classList.remove('active');
             });
 
-            // 4. Show the selected page
             const targetPage = document.getElementById(pageId);
             if(targetPage) {
-                // Small delay to allow CSS animation to trigger smoothly
                 setTimeout(() => {
                     targetPage.classList.add('active');
                 }, 50);
             }
 
-            // 5. Highlight the active nav item (if it's in the menu)
             const activeNav = document.getElementById('nav-' + pageId);
             if (activeNav) {
                 activeNav.classList.add('active');
             }
 
-            // 6. Update the URL hash so the user can share specific pages (e.g. #contact)
             window.location.hash = pageId;
-            window.scrollTo(0, 0); // scroll to top
+            window.scrollTo(0, 0);
         }
 
-        // Check the URL when the site loads. If they go to yoursite.com/#success, load the success page.
         window.onload = function() {
             const hash = window.location.hash.substring(1);
             if (hash && document.getElementById(hash)) {
